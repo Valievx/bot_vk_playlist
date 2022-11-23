@@ -1,11 +1,8 @@
-import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from auth_data import vk_password, vk_login, token, playlist_id
 import time
-from bs4 import BeautifulSoup
-import json
 
 
 # options
@@ -40,34 +37,23 @@ password_button = driver.find_element(By.XPATH, "//*[@id='root']/div/div/div/div
 time.sleep(50)
 '''
 
-# Enter and open a playlist
+# Вход и открытие плейлиста
 
 driver.get(f"{playlist_id}")
 time.sleep(2)
 url = playlist_id
 
 
-
-# Parser audio
-req = requests.get(url=url)
-result = req.content
-
-soup = BeautifulSoup(result, "lxml")
-hrefs = soup.find(class_="AudioPlaylistRoot")
+# Цикл
+amount = driver.find_element(By.XPATH, f'//*[@id="mcont"]/div/div/div[4]').text
+new_amount = amount[:-30]   # 30 # 32 # 34
+new_thing = int(new_amount) + 1
+print(new_thing)
 
 
-
-audio_data = []
-count = 0
-for item in hrefs:
-    href_audio = item.get("data-audio")
-    # print(href_audio)
-
-    count += 1
-    audio_data.append(href_audio)
-
-with open("audio_data.json", "w", encoding="utf8") as file:
-    json.dump(audio_data, file, indent=4, ensure_ascii=False)
+for i in range(1, new_thing):
+    driver.find_element(By.XPATH, f'//*[@id="mcont"]/div/div/div[3]/div/div[{i}]').click()
+    time.sleep(36)
 
 
 driver.close()
