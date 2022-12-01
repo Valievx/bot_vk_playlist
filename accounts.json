@@ -1,1 +1,9 @@
-
+{
+  "accounts": [
+    {
+      "phone": "",
+      "password": "",
+      "id": ""
+    }
+  ]
+}
