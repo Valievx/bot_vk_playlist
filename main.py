@@ -3,7 +3,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import time
 import json
-from threading import *
+import os
+import sys
 
 
 '''options'''
@@ -14,8 +15,9 @@ from threading import *
 
 playlist_url = input("Введите URl playlist: ")
 
+working_dir = os.path.sep.join(sys.argv[0].split(os.path.sep)[:-1])
 
-with open("accounts.json", "r", encoding="utf-8") as file:
+with open(os.path.join(working_dir, "accounts.json"), "r", encoding="utf-8") as file:
     data = json.loads(file.read())
     accounts = data["accounts"]
 
@@ -72,7 +74,6 @@ def auth_user():
                 time.sleep(36)
                 driver.find_element(By.XPATH, f'//*[@id="mcont"]/div/div/div[1]/div[1]/div[2]/div/div/div[1]/a').click()
                 time.sleep(2)
-
         except Exception as ex:
             print(ex)
         finally:
@@ -81,7 +82,5 @@ def auth_user():
 
 
 if __name__ == '__main__':
-    p1 = Thread(target=auth_user)
+    auth_user()
 
-    p1.start()
-    p1.join()
