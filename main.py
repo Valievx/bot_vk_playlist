@@ -5,6 +5,7 @@ import time
 import json
 import os
 import sys
+import threading
 
 
 '''options'''
@@ -12,7 +13,6 @@ import sys
 
 
 '''Authorization'''
-
 playlist_url = input("Введите URl playlist: ")
 
 working_dir = os.path.sep.join(sys.argv[0].split(os.path.sep)[:-1])
@@ -22,13 +22,17 @@ with open(os.path.join(working_dir, "accounts.json"), "r", encoding="utf-8") as 
     accounts = data["accounts"]
 
 
-def auth_user():
-    for account in accounts:
+def auth_user(t):
+    for k in range(0 + t, len(accounts) + t, 2):
+        if k >= len(accounts):  # проверяем к , чтоб не вылететь за пределы списка.
+            continue
+        account = accounts[k]
+
         try:
             options = webdriver.ChromeOptions()
             options.add_argument(f"user-data-dir={account['id']}")
             options.add_argument("user-agent=VKAndroidApp/4.38-849 (Android 6.0; SDK 23; x86; Google Nexus 5X; ru")
-            # options.add_argument("--disable-blink-features=AutomationControlled")
+            options.add_argument("--disable-blink-features=AutomationControlled")
             s = Service("/Users/valiev/code/python/vkbot_playlist/chromedriver/chromedriver")
             driver = webdriver.Chrome(service=s, options=options)
 
@@ -58,6 +62,7 @@ def auth_user():
 
                 password_button = driver.find_element(By.XPATH, "//*[@id='root']/div/div/div/div/div[2]/div/div/div/form/div[2]/button").click()
                 time.sleep(2)
+
             except Exception as ex:
                 pass
 
@@ -67,7 +72,6 @@ def auth_user():
             amount = driver.find_element(By.XPATH, f'//*[@id="mcont"]/div/div/div[4]').text
             new_amount = amount[:2]   # 2(1-99) 3(100-999)
             new_thing = int(new_amount) + 1
-            print(new_thing)
 
             for i in range(1, new_thing):
                 driver.find_element(By.XPATH, f'//*[@id="mcont"]/div/div/div[3]/div/div[{i}]').click()
@@ -82,5 +86,9 @@ def auth_user():
 
 
 if __name__ == '__main__':
-    auth_user()
+    threads = []
+    for i in range(2):
+        t = threading.Thread(target=auth_user, args=(i,))
+        threads.append(t)
+        t.start()
 
